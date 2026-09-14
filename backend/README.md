@@ -2,18 +2,31 @@
 
 Backend for the Codomax Full Stack Web Development Internship project.
 
-## Database Integration
+## Module 5 Authentication
 
-This version uses **MongoDB with Mongoose**.
+This backend uses **JWT authentication** with MongoDB.
 
-User credentials and blog posts are stored in MongoDB. Passwords are never stored as plain text; they are hashed with bcrypt.
+### Security Features
+
+- Passwords are hashed with bcrypt.
+- Login returns a signed JWT.
+- JWT expires after 2 hours.
+- Protected routes require `Authorization: Bearer <token>`.
+- Blog documents store an `owner` user ID.
+- Update and delete operations are limited to the blog owner.
+- MongoDB URI and JWT secret are stored in environment variables.
+
+## Environment Variables
+
+```env
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=use_a_long_random_secret
+PORT=5000
+```
+
+Do not commit your real `.env` file.
 
 ## Setup
-
-1. Create a MongoDB Atlas database.
-2. Copy `.env.example` to `.env`.
-3. Put your MongoDB connection string in `MONGODB_URI`.
-4. Install dependencies and start the server.
 
 ```bash
 cd backend
@@ -21,38 +34,41 @@ npm install
 npm start
 ```
 
-The backend runs at:
+## Authentication APIs
 
-`http://localhost:5000`
-
-## Environment Variables
-
-```env
-MONGODB_URI=your_mongodb_connection_string
-PORT=5000
-```
-
-Do not commit your real `.env` file.
-
-## REST APIs
-
-### Register User
+### Register
 `POST /api/register`
 
-### Login User
+### Login
 `POST /api/login`
 
-### Create Blog
-`POST /api/blogs`
+The login response contains:
 
-### Get All Blogs
-`GET /api/blogs`
+```json
+{
+  "token": "JWT_TOKEN",
+  "user": {
+    "id": "USER_ID",
+    "name": "User Name",
+    "email": "user@example.com"
+  }
+}
+```
 
-### Get Individual Blog
-`GET /api/blogs/:id`
+### Profile
+`GET /api/profile`
 
-## Security
+Protected with a Bearer token.
 
-- Passwords are hashed using bcrypt.
-- The MongoDB URI is stored in an environment variable.
-- `.env` and `node_modules` are excluded by `.gitignore`.
+### My Blogs
+`GET /api/my-blogs`
+
+Returns only blogs owned by the authenticated user.
+
+## Blog APIs
+
+- `POST /api/blogs` — protected
+- `GET /api/blogs` — public
+- `GET /api/blogs/:id` — public
+- `PUT /api/blogs/:id` — protected + owner-only
+- `DELETE /api/blogs/:id` — protected + owner-only
