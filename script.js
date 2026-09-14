@@ -1,4 +1,6 @@
 const API_BASE_URL = "http://localhost:5000/api";
+const TOKEN_KEY = "codomaxToken";
+const USER_KEY = "codomaxUser";
 
 function safe(value) {
   return String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -10,17 +12,80 @@ function safe(value) {
   }[char]));
 }
 
-async function fetchBlogs(search = "", category = "") {
+function getToken() {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+function getCurrentUser() {
+  try {
+    return JSON.parse(localStorage.getItem(USER_KEY) || "null");
+  } catch {
+    return null;
+  }
+}
+
+function authHeaders(extra = {}) {
+  const token = getToken();
+  return {
+    ...extra,
+    ...(token ? { Authorization: `Bearer ${token}` } : {})
+  };
+}
+
+function logout() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+  location.href = "login.html";
+}
+
+async function verifyAuthentication() {
+  const privatePages = ["dashboard.html", "create-blog.html", "edit-blog.html", "profile.html"];
+  const currentPage = location.pathname.split("/").pop() || "index.html";
+
+  if (!privatePages.includes(currentPage)) return true;
+
+  const token = getToken();
+  if (!token) {
+    location.href = "login.html";
+    return false;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/profile`, {
+      headers: authHeaders()
+    });
+
+    if (!response.ok) {
+      logout();
+      return false;
+    }
+
+    const data = await response.json();
+    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    return true;
+  } catch {
+    return true;
+  }
+}
+
+async function fetchBlogs(search = "", category = "", mine = false) {
   const params = new URLSearchParams();
   if (search.trim()) params.set("search", search.trim());
   if (category.trim()) params.set("category", category.trim());
 
-  const url = params.toString()
-    ? `${API_BASE_URL}/blogs?${params.toString()}`
-    : `${API_BASE_URL}/blogs`;
+  const endpoint = mine ? "my-blogs" : "blogs";
+  const query = params.toString() ? `?${params.toString()}` : "";
 
-  const response = await fetch(url);
+  const response = await fetch(`${API_BASE_URL}/${endpoint}${query}`, {
+    headers: mine ? authHeaders() : {}
+  });
+
   const data = await response.json();
+
+  if (response.status === 401 && mine) {
+    logout();
+    throw new Error("Session expired.");
+  }
 
   if (!response.ok) {
     throw new Error(data.message || "Could not load blogs.");
@@ -38,10 +103,12 @@ async function renderPosts(id, options = {}) {
   const dashboardMode = id === "dashboardPosts";
 
   try {
-    const posts = await fetchBlogs(search, category);
+    const posts = await fetchBlogs(search, category, dashboardMode);
 
     if (!posts.length) {
-      target.innerHTML = '<div class="empty-state">No matching blogs found.</div>';
+      target.innerHTML = dashboardMode
+        ? '<div class="empty-state">You have not created any matching blogs yet.</div>'
+        : '<div class="empty-state">No matching blogs found.</div>';
     } else {
       target.innerHTML = posts.map((post) => `
         <article class="blog-card">
@@ -64,11 +131,10 @@ async function renderPosts(id, options = {}) {
 
     const total = document.getElementById("totalPosts");
     const published = document.getElementById("publishedPosts");
-
     if (total) total.textContent = posts.length;
     if (published) published.textContent = posts.length;
   } catch (error) {
-    target.innerHTML = '<div class="empty-state">Unable to load blogs. Make sure the backend and MongoDB connection are running.</div>';
+    target.innerHTML = `<div class="empty-state">${safe(error.message)}</div>`;
   }
 }
 
@@ -92,15 +158,20 @@ async function loadBlogDetail() {
       throw new Error(blog.message || "Blog not found.");
     }
 
+    const currentUser = getCurrentUser();
+    const isOwner = currentUser && String(blog.owner) === String(currentUser.id);
+
     target.innerHTML = `
       <span class="category">${safe(blog.category)}</span>
       <h1>${safe(blog.title)}</h1>
       <p class="detail-meta">By ${safe(blog.author || "Anonymous")} · ${new Date(blog.createdAt).toLocaleString()}</p>
       <div class="blog-content">${safe(blog.content).replace(/\n/g, "<br>")}</div>
-      <div class="detail-actions">
-        <a class="btn" href="edit-blog.html?id=${encodeURIComponent(blog._id)}">Edit Blog</a>
-        <button class="btn danger" type="button" onclick="deleteBlog('${safe(blog._id)}', true)">Delete Blog</button>
-      </div>
+      ${isOwner ? `
+        <div class="detail-actions">
+          <a class="btn" href="edit-blog.html?id=${encodeURIComponent(blog._id)}">Edit Blog</a>
+          <button class="btn danger" type="button" onclick="deleteBlog('${safe(blog._id)}', true)">Delete Blog</button>
+        </div>
+      ` : ""}
     `;
   } catch (error) {
     target.innerHTML = `<h2>Unable to load blog</h2><p>${safe(error.message)}</p>`;
@@ -128,6 +199,13 @@ async function loadEditBlog() {
       throw new Error(blog.message || "Blog not found.");
     }
 
+    const currentUser = getCurrentUser();
+    if (!currentUser || String(blog.owner) !== String(currentUser.id)) {
+      message.textContent = "You can edit only your own blogs.";
+      form.querySelector("button[type='submit']").disabled = true;
+      return;
+    }
+
     document.getElementById("editBlogTitle").value = blog.title;
     document.getElementById("editBlogCategory").value = blog.category;
     document.getElementById("editBlogContent").value = blog.content;
@@ -144,11 +222,16 @@ async function loadEditBlog() {
 
       const updateResponse = await fetch(`${API_BASE_URL}/blogs/${encodeURIComponent(blogId)}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify(payload)
       });
 
       const updateData = await updateResponse.json();
+
+      if (updateResponse.status === 401) {
+        logout();
+        return;
+      }
 
       if (!updateResponse.ok) {
         message.textContent = updateData.message || "Update failed.";
@@ -171,10 +254,16 @@ async function deleteBlog(blogId, fromDetail = false) {
 
   try {
     const response = await fetch(`${API_BASE_URL}/blogs/${encodeURIComponent(blogId)}`, {
-      method: "DELETE"
+      method: "DELETE",
+      headers: authHeaders()
     });
 
     const data = await response.json();
+
+    if (response.status === 401) {
+      logout();
+      return;
+    }
 
     if (!response.ok) {
       alert(data.message || "Could not delete blog.");
@@ -220,9 +309,7 @@ document.getElementById("registerForm")?.addEventListener("submit", async (event
     }
 
     message.textContent = "Registration successful! Redirecting to login...";
-    setTimeout(() => {
-      location.href = "login.html";
-    }, 800);
+    setTimeout(() => location.href = "login.html", 800);
   } catch (error) {
     message.textContent = "Backend server is not running or MongoDB is not connected.";
   }
@@ -253,12 +340,11 @@ document.getElementById("loginForm")?.addEventListener("submit", async (event) =
       return;
     }
 
-    localStorage.setItem("codomaxUser", JSON.stringify(data.user));
+    localStorage.setItem(TOKEN_KEY, data.token);
+    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
     message.textContent = "Login successful!";
 
-    setTimeout(() => {
-      location.href = "dashboard.html";
-    }, 700);
+    setTimeout(() => location.href = "dashboard.html", 700);
   } catch (error) {
     message.textContent = "Backend server is not running or MongoDB is not connected.";
   }
@@ -270,23 +356,25 @@ document.getElementById("blogForm")?.addEventListener("submit", async (event) =>
   const message = document.getElementById("blogMessage");
   message.textContent = "Publishing blog...";
 
-  const user = JSON.parse(localStorage.getItem("codomaxUser") || "null");
-
   const payload = {
     title: document.getElementById("blogTitle").value.trim(),
     category: document.getElementById("blogCategory").value,
-    content: document.getElementById("blogContent").value.trim(),
-    author: user?.name || "Anonymous"
+    content: document.getElementById("blogContent").value.trim()
   };
 
   try {
     const response = await fetch(`${API_BASE_URL}/blogs`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders({ "Content-Type": "application/json" }),
       body: JSON.stringify(payload)
     });
 
     const data = await response.json();
+
+    if (response.status === 401) {
+      logout();
+      return;
+    }
 
     if (!response.ok) {
       message.textContent = data.message || "Could not publish blog.";
@@ -304,6 +392,42 @@ document.getElementById("blogForm")?.addEventListener("submit", async (event) =>
   }
 });
 
+async function loadProfile() {
+  const target = document.getElementById("profileCard");
+  if (!target) return;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/profile`, {
+      headers: authHeaders()
+    });
+
+    const data = await response.json();
+
+    if (response.status === 401) {
+      logout();
+      return;
+    }
+
+    if (!response.ok) throw new Error(data.message || "Unable to load profile.");
+
+    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+
+    target.innerHTML = `
+      <div class="profile-avatar">${safe(data.user.name).charAt(0).toUpperCase()}</div>
+      <h2>${safe(data.user.name)}</h2>
+      <p>${safe(data.user.email)}</p>
+      <div class="profile-actions">
+        <a class="btn" href="dashboard.html">My Dashboard</a>
+        <button class="btn danger" id="profileLogout" type="button">Logout</button>
+      </div>
+    `;
+
+    document.getElementById("profileLogout")?.addEventListener("click", logout);
+  } catch (error) {
+    target.innerHTML = `<p>${safe(error.message)}</p>`;
+  }
+}
+
 function attachFilters() {
   const search = document.getElementById("searchBlogs");
   const category = document.getElementById("categoryFilter");
@@ -313,15 +437,29 @@ function attachFilters() {
   category?.addEventListener("change", () => renderPosts(targetId));
 }
 
-const currentUser = JSON.parse(localStorage.getItem("codomaxUser") || "null");
-const welcome = document.getElementById("welcomeText");
+function setupAuthUi() {
+  const logoutButton = document.getElementById("logoutButton");
+  logoutButton?.addEventListener("click", logout);
 
-if (welcome && currentUser) {
-  welcome.textContent = `Welcome, ${currentUser.name}. Create, read, update and delete your blogs.`;
+  const currentUser = getCurrentUser();
+  const welcome = document.getElementById("welcomeText");
+
+  if (welcome && currentUser) {
+    welcome.textContent = `Welcome, ${currentUser.name}. Only your blogs are shown below.`;
+  }
 }
 
-attachFilters();
-renderPosts("blogGrid");
-renderPosts("dashboardPosts");
-loadBlogDetail();
-loadEditBlog();
+async function initializeApp() {
+  const allowed = await verifyAuthentication();
+  if (!allowed) return;
+
+  setupAuthUi();
+  attachFilters();
+  renderPosts("blogGrid");
+  renderPosts("dashboardPosts");
+  loadBlogDetail();
+  loadEditBlog();
+  loadProfile();
+}
+
+initializeApp();
