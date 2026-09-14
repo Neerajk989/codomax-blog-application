@@ -3,7 +3,6 @@
 Full Stack Web Development internship project for **Codomax Digital Solutions**.
 
 ## Module 1 — Frontend Development
-
 Completed:
 - Responsive Blog Application
 - Home page
@@ -13,7 +12,6 @@ Completed:
 - Create Blog page
 
 ## Module 2 — Backend Development
-
 Completed:
 - Node.js and Express.js backend
 - REST APIs
@@ -23,16 +21,25 @@ Completed:
 - Frontend and backend integration
 
 ## Module 3 — Database Integration
-
 Completed:
-- MongoDB database integration with Mongoose
+- MongoDB + Mongoose
 - User credentials stored in MongoDB
 - Passwords hashed with bcrypt
 - Blog posts stored in MongoDB
-- Retrieve and display all blogs from the database
+- Retrieve all blogs
 - Individual blog details page
-- `GET /api/blogs/:id` API
-- Secure database connection through `MONGODB_URI` environment variable
+
+## Module 4 — CRUD Operations
+Completed:
+- **Create** blog posts
+- **Read** all blogs and individual blog details
+- **Update** existing blogs
+- **Delete** blogs
+- Search blogs by title, content or author
+- Filter blogs by category
+- Edit Blog page
+- Delete controls from dashboard and blog details
+- MongoDB-backed CRUD REST APIs
 
 ## Technologies
 
@@ -52,35 +59,40 @@ Completed:
 - MongoDB
 - Mongoose
 
-## REST API Endpoints
+## CRUD REST API Endpoints
 
+- `POST /api/blogs` — Create blog
+- `GET /api/blogs` — Read all blogs
+- `GET /api/blogs/:id` — Read one blog
+- `PUT /api/blogs/:id` — Update blog
+- `DELETE /api/blogs/:id` — Delete blog
+- `GET /api/blogs?search=term&category=Technology` — Search/filter blogs
+
+Authentication:
 - `POST /api/register`
 - `POST /api/login`
-- `POST /api/blogs`
-- `GET /api/blogs`
-- `GET /api/blogs/:id`
 
 ## Project Pages
-
-- `index.html` — Home and all database blogs
+- `index.html` — Home, search, category filter
 - `login.html` — Login
 - `register.html` — Register
-- `dashboard.html` — Dashboard
+- `dashboard.html` — Manage blogs with Edit/Delete
 - `create-blog.html` — Create Blog
+- `edit-blog.html` — Update Blog
 - `blog-detail.html` — Individual Blog Details
 
 ## Run the Project
 
 ### 1. Configure MongoDB
 
-Inside the `backend` folder, copy `.env.example` to `.env` and replace the example value with your MongoDB Atlas connection string.
+Create `backend/.env` using `backend/.env.example`:
 
 ```env
 MONGODB_URI=your_mongodb_connection_string
 PORT=5000
 ```
 
-### 2. Start the backend
+### 2. Start backend
 
 ```bash
 cd backend
@@ -88,9 +100,9 @@ npm install
 npm start
 ```
 
-### 3. Start the frontend
+### 3. Start frontend
 
-Open the project root with VS Code and run `index.html` using Live Server.
+Open the root folder with VS Code and launch `index.html` using Live Server.
 
 ## Internship Submission
 
