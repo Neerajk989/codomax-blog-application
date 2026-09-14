@@ -7,21 +7,34 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header class="navbar"><a class="brand" href="index.html">Codomax Blog</a><nav><a href="index.html">Home</a><a class="btn small" href="create-blog.html">Create Blog</a></nav></header>
+<header class="navbar">
+<a class="brand" href="index.html">Codomax Blog</a>
+<nav>
+<a href="index.html">Home</a>
+<a href="profile.html">Profile</a>
+<a class="btn small" href="create-blog.html">Create Blog</a>
+<button id="logoutButton" class="nav-button" type="button">Logout</button>
+</nav>
+</header>
+
 <main class="section dashboard">
 <div class="section-heading">
-<div><p class="eyebrow">Module 4 · CRUD Operations</p><h1>Your Blog Space</h1><p id="welcomeText">Manage your posts and keep writing.</p></div>
+<div>
+<p class="eyebrow">Module 5 · Authentication & Dashboard</p>
+<h1>Your Private Dashboard</h1>
+<p id="welcomeText">Loading your account...</p>
+</div>
 <a class="btn" href="create-blog.html">+ New Post</a>
 </div>
 
 <div class="stats-grid">
-<article class="stat-card"><span>Total Posts</span><strong id="totalPosts">0</strong></article>
+<article class="stat-card"><span>Your Blogs</span><strong id="totalPosts">0</strong></article>
 <article class="stat-card"><span>Published</span><strong id="publishedPosts">0</strong></article>
-<article class="stat-card"><span>CRUD</span><strong>Active</strong></article>
+<article class="stat-card"><span>Authentication</span><strong>JWT</strong></article>
 </div>
 
 <div class="filter-bar">
-<input id="searchBlogs" type="search" placeholder="Search blogs by title, content or author">
+<input id="searchBlogs" type="search" placeholder="Search your blogs">
 <select id="categoryFilter">
 <option value="">All Categories</option>
 <option>Technology</option>
@@ -31,9 +44,10 @@
 </select>
 </div>
 
-<h2>Your Posts</h2>
+<h2>My Blogs</h2>
 <div id="dashboardPosts" class="blog-grid"></div>
 </main>
+
 <script src="script.js"></script>
 </body>
 </html>
