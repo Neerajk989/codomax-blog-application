@@ -5,41 +5,43 @@ Full Stack Web Development internship project for **Codomax Digital Solutions**.
 ## Module 1 — Frontend Development
 Completed:
 - Responsive Blog Application
-- Home page
-- Login page
-- Register page
-- Dashboard
-- Create Blog page
+- Home, Login, Register, Dashboard and Create Blog pages
 
 ## Module 2 — Backend Development
 Completed:
 - Node.js and Express.js backend
 - REST APIs
-- User Registration
-- User Login
-- Create Blog
-- Frontend and backend integration
+- User Registration and Login
+- Frontend/backend integration
 
 ## Module 3 — Database Integration
 Completed:
 - MongoDB + Mongoose
-- User credentials stored in MongoDB
-- Passwords hashed with bcrypt
-- Blog posts stored in MongoDB
-- Retrieve all blogs
+- User credentials and blogs stored in MongoDB
+- bcrypt password hashing
 - Individual blog details page
 
 ## Module 4 — CRUD Operations
 Completed:
-- **Create** blog posts
-- **Read** all blogs and individual blog details
-- **Update** existing blogs
-- **Delete** blogs
-- Search blogs by title, content or author
-- Filter blogs by category
+- Create, Read, Update and Delete blogs
+- Search blogs
+- Category filters
 - Edit Blog page
-- Delete controls from dashboard and blog details
-- MongoDB-backed CRUD REST APIs
+
+## Module 5 — Authentication & Dashboard
+Completed:
+- JWT-based user authentication
+- JWT token returned after successful login
+- Protected backend routes using Bearer tokens
+- Protected Dashboard, Create Blog, Edit Blog and Profile pages
+- Dashboard shows only the logged-in user's blogs
+- Blog ownership stored with each MongoDB blog document
+- Users can edit/delete only their own blogs
+- User Profile page
+- Logout functionality
+- JWT expiry set to 2 hours
+- Profile API: `GET /api/profile`
+- User-specific blogs API: `GET /api/my-blogs`
 
 ## Technologies
 
@@ -51,6 +53,7 @@ Completed:
 ### Backend
 - Node.js
 - Express.js
+- JSON Web Token (JWT)
 - bcryptjs
 - CORS
 - dotenv
@@ -59,40 +62,51 @@ Completed:
 - MongoDB
 - Mongoose
 
-## CRUD REST API Endpoints
+## Authentication API
 
-- `POST /api/blogs` — Create blog
-- `GET /api/blogs` — Read all blogs
-- `GET /api/blogs/:id` — Read one blog
-- `PUT /api/blogs/:id` — Update blog
-- `DELETE /api/blogs/:id` — Delete blog
-- `GET /api/blogs?search=term&category=Technology` — Search/filter blogs
+- `POST /api/register` — Register user
+- `POST /api/login` — Login and receive JWT
+- `GET /api/profile` — Protected profile
+- `GET /api/my-blogs` — Protected logged-in user's blogs
 
-Authentication:
-- `POST /api/register`
-- `POST /api/login`
+Protected requests use:
+
+```http
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+## Blog API
+
+- `POST /api/blogs` — Create blog (protected)
+- `GET /api/blogs` — Public list of blogs
+- `GET /api/blogs/:id` — Public individual blog
+- `PUT /api/blogs/:id` — Update own blog (protected)
+- `DELETE /api/blogs/:id` — Delete own blog (protected)
 
 ## Project Pages
-- `index.html` — Home, search, category filter
+
+- `index.html` — Public blog listing
 - `login.html` — Login
 - `register.html` — Register
-- `dashboard.html` — Manage blogs with Edit/Delete
-- `create-blog.html` — Create Blog
-- `edit-blog.html` — Update Blog
-- `blog-detail.html` — Individual Blog Details
+- `dashboard.html` — Private user dashboard
+- `create-blog.html` — Protected create page
+- `edit-blog.html` — Protected edit page
+- `blog-detail.html` — Blog details
+- `profile.html` — Private user profile
 
-## Run the Project
+## Environment Setup
 
-### 1. Configure MongoDB
-
-Create `backend/.env` using `backend/.env.example`:
+Create `backend/.env` from `backend/.env.example`:
 
 ```env
 MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=use_a_long_random_secret
 PORT=5000
 ```
 
-### 2. Start backend
+Never commit your real `.env` file.
+
+## Run
 
 ```bash
 cd backend
@@ -100,9 +114,7 @@ npm install
 npm start
 ```
 
-### 3. Start frontend
-
-Open the root folder with VS Code and launch `index.html` using Live Server.
+Then open the frontend using VS Code Live Server.
 
 ## Internship Submission
 
