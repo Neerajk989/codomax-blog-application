@@ -34,13 +34,15 @@ const Blog = mongoose.model("Blog", blogSchema);
 
 app.get("/", (req, res) => {
   res.json({
-    message: "Codomax Blog API with MongoDB is running",
+    message: "Codomax Blog CRUD API with MongoDB is running",
     endpoints: [
       "POST /api/register",
       "POST /api/login",
       "POST /api/blogs",
       "GET /api/blogs",
-      "GET /api/blogs/:id"
+      "GET /api/blogs/:id",
+      "PUT /api/blogs/:id",
+      "DELETE /api/blogs/:id"
     ]
   });
 });
@@ -48,24 +50,20 @@ app.get("/", (req, res) => {
 app.post("/api/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
-
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Name, email and password are required." });
     }
-
     if (password.length < 6) {
       return res.status(400).json({ message: "Password must be at least 6 characters." });
     }
 
     const normalizedEmail = email.trim().toLowerCase();
     const existingUser = await User.findOne({ email: normalizedEmail });
-
     if (existingUser) {
       return res.status(409).json({ message: "User already exists." });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-
     const user = await User.create({
       name: name.trim(),
       email: normalizedEmail,
@@ -85,20 +83,17 @@ app.post("/api/register", async (req, res) => {
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required." });
     }
 
     const normalizedEmail = email.trim().toLowerCase();
     const user = await User.findOne({ email: normalizedEmail });
-
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password." });
     }
 
     const passwordMatches = await bcrypt.compare(password, user.passwordHash);
-
     if (!passwordMatches) {
       return res.status(401).json({ message: "Invalid email or password." });
     }
@@ -116,7 +111,6 @@ app.post("/api/login", async (req, res) => {
 app.post("/api/blogs", async (req, res) => {
   try {
     const { title, category, content, author } = req.body;
-
     if (!title || !category || !content) {
       return res.status(400).json({ message: "Title, category and content are required." });
     }
@@ -128,10 +122,7 @@ app.post("/api/blogs", async (req, res) => {
       author: author?.trim() || "Anonymous"
     });
 
-    return res.status(201).json({
-      message: "Blog created successfully.",
-      blog
-    });
+    return res.status(201).json({ message: "Blog created successfully.", blog });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Unable to create blog." });
@@ -140,7 +131,22 @@ app.post("/api/blogs", async (req, res) => {
 
 app.get("/api/blogs", async (req, res) => {
   try {
-    const blogs = await Blog.find().sort({ createdAt: -1 });
+    const { search = "", category = "" } = req.query;
+    const filter = {};
+
+    if (search.trim()) {
+      filter.$or = [
+        { title: { $regex: search.trim(), $options: "i" } },
+        { content: { $regex: search.trim(), $options: "i" } },
+        { author: { $regex: search.trim(), $options: "i" } }
+      ];
+    }
+
+    if (category.trim()) {
+      filter.category = category.trim();
+    }
+
+    const blogs = await Blog.find(filter).sort({ createdAt: -1 });
     return res.json(blogs);
   } catch (error) {
     console.error(error);
@@ -155,7 +161,6 @@ app.get("/api/blogs/:id", async (req, res) => {
     }
 
     const blog = await Blog.findById(req.params.id);
-
     if (!blog) {
       return res.status(404).json({ message: "Blog not found." });
     }
@@ -164,6 +169,56 @@ app.get("/api/blogs/:id", async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Unable to retrieve blog." });
+  }
+});
+
+app.put("/api/blogs/:id", async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid blog ID." });
+    }
+
+    const { title, category, content } = req.body;
+    if (!title || !category || !content) {
+      return res.status(400).json({ message: "Title, category and content are required." });
+    }
+
+    const blog = await Blog.findByIdAndUpdate(
+      req.params.id,
+      {
+        title: title.trim(),
+        category: category.trim(),
+        content: content.trim()
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found." });
+    }
+
+    return res.json({ message: "Blog updated successfully.", blog });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Unable to update blog." });
+  }
+});
+
+app.delete("/api/blogs/:id", async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid blog ID." });
+    }
+
+    const blog = await Blog.findByIdAndDelete(req.params.id);
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found." });
+    }
+
+    return res.json({ message: "Blog deleted successfully." });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Unable to delete blog." });
   }
 });
 
