@@ -1,29 +1,88 @@
 # Codomax Blog Application
 
-Frontend Development internship task for **Codomax Digital Solutions**.
+Full Stack Web Development internship project for **Codomax Digital Solutions**.
 
-## Day 1 – Day 4 | Beginner | High Priority
+## Module 1 — Day 1 to Day 4
 
-### What this project includes
+Frontend Development | Beginner | High Priority
 
-- Local frontend development setup
-- HTML, CSS and JavaScript
-- Responsive Blog Application interface
+### Completed
+
+- Set up the frontend project
+- Built the application using HTML, CSS and JavaScript
+- Created a responsive Blog Application interface
 - Home page
 - Login page
 - Register page
 - Dashboard
 - Create Blog page
-- LocalStorage-based demo registration, login and blog publishing
+
+## Module 2 — Day 5 to Day 8
+
+Backend Development | Intermediate | High Priority
+
+### Completed
+
+- Set up a backend server using Node.js and Express.js
+- Created REST APIs
+- User Registration API
+- User Login API
+- Create Blog API
+- Get Blogs API
+- Connected the frontend forms and blog pages to backend APIs
+- Added bcrypt password hashing
+- Added simple JSON file persistence for users and blogs
 
 ## Technologies
 
+### Frontend
 - HTML5
 - CSS3
 - JavaScript
-- Browser LocalStorage
 
-## Pages
+### Backend
+- Node.js
+- Express.js
+- bcryptjs
+- CORS
+- JSON file storage
+
+## REST API Endpoints
+
+- `POST /api/register`
+- `POST /api/login`
+- `POST /api/blogs`
+- `GET /api/blogs`
+
+## Run the Project
+
+### 1. Start the backend
+
+```bash
+cd backend
+npm install
+npm start
+```
+
+Backend runs at:
+
+```
+http://localhost:5000
+```
+
+### 2. Start the frontend
+
+Open the project root using VS Code and launch `index.html` with Live Server.
+
+The frontend uses:
+
+```
+http://localhost:5000/api
+```
+
+as its API base URL.
+
+## Project Pages
 
 - `index.html` — Home
 - `login.html` — Login
@@ -31,9 +90,12 @@ Frontend Development internship task for **Codomax Digital Solutions**.
 - `dashboard.html` — Dashboard
 - `create-blog.html` — Create Blog
 
-## Run locally
+## Backend Files
 
-Clone the repository and open `index.html` in your browser, or use the VS Code Live Server extension.
+- `backend/server.js` — Express server and REST APIs
+- `backend/package.json` — Backend dependencies and scripts
+- `backend/data.json` — Simple development data storage
+- `backend/README.md` — API usage instructions
 
 ## Internship Submission
 
