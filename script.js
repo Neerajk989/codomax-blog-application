@@ -1,28 +1,7 @@
 const API_BASE_URL = "http://localhost:5000/api";
 
-const starterPosts = [
-  {
-    title: "Getting Started with Web Development",
-    category: "Web Development",
-    content: "HTML gives structure, CSS controls presentation and JavaScript adds interaction.",
-    date: "Day 1"
-  },
-  {
-    title: "Why Responsive Design Matters",
-    category: "Technology",
-    content: "Responsive design helps websites adapt smoothly to phones, tablets and desktops.",
-    date: "Day 2"
-  },
-  {
-    title: "My Codomax Internship Journey",
-    category: "Learning",
-    content: "This project is part of my Full Stack Web Development internship task at Codomax.",
-    date: "Day 4"
-  }
-];
-
 function safe(value) {
-  return String(value).replace(/[&<>"']/g, (char) => ({
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
@@ -32,44 +11,78 @@ function safe(value) {
 }
 
 async function fetchBlogs() {
-  try {
-    const response = await fetch(`${API_BASE_URL}/blogs`);
-    if (!response.ok) throw new Error("Could not load blogs");
-    const backendBlogs = await response.json();
+  const response = await fetch(`${API_BASE_URL}/blogs`);
+  const data = await response.json();
 
-    const formattedBlogs = backendBlogs.map((blog) => ({
-      title: blog.title,
-      category: blog.category,
-      content: blog.content,
-      date: new Date(blog.createdAt).toLocaleDateString()
-    }));
-
-    return [...formattedBlogs, ...starterPosts];
-  } catch (error) {
-    return starterPosts;
+  if (!response.ok) {
+    throw new Error(data.message || "Could not load blogs.");
   }
+
+  return data;
 }
 
 async function renderPosts(id) {
   const target = document.getElementById(id);
   if (!target) return;
 
-  const posts = await fetchBlogs();
+  try {
+    const posts = await fetchBlogs();
 
-  target.innerHTML = posts.map((post) => `
-    <article class="blog-card">
-      <span class="category">${safe(post.category)}</span>
-      <h3>${safe(post.title)}</h3>
-      <p>${safe(post.content).slice(0, 180)}</p>
-      <small>${safe(post.date || "Published")}</small>
-    </article>
-  `).join("");
+    if (!posts.length) {
+      target.innerHTML = '<div class="empty-state">No blogs in MongoDB yet. Create your first blog from the dashboard.</div>';
+    } else {
+      target.innerHTML = posts.map((post) => `
+        <article class="blog-card">
+          <span class="category">${safe(post.category)}</span>
+          <h3>${safe(post.title)}</h3>
+          <p>${safe(post.content).slice(0, 180)}${post.content.length > 180 ? "..." : ""}</p>
+          <div class="blog-meta">
+            <small>By ${safe(post.author || "Anonymous")} · ${new Date(post.createdAt).toLocaleDateString()}</small>
+            <a class="read-more" href="blog-detail.html?id=${encodeURIComponent(post._id)}">Read More →</a>
+          </div>
+        </article>
+      `).join("");
+    }
 
-  const total = document.getElementById("totalPosts");
-  const published = document.getElementById("publishedPosts");
+    const total = document.getElementById("totalPosts");
+    const published = document.getElementById("publishedPosts");
 
-  if (total) total.textContent = posts.length;
-  if (published) published.textContent = posts.length;
+    if (total) total.textContent = posts.length;
+    if (published) published.textContent = posts.length;
+  } catch (error) {
+    target.innerHTML = '<div class="empty-state">Unable to load blogs. Make sure the backend and MongoDB connection are running.</div>';
+  }
+}
+
+async function loadBlogDetail() {
+  const target = document.getElementById("blogDetail");
+  if (!target) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const blogId = params.get("id");
+
+  if (!blogId) {
+    target.innerHTML = "<h2>Blog not found</h2><p>No blog ID was provided.</p>";
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/blogs/${encodeURIComponent(blogId)}`);
+    const blog = await response.json();
+
+    if (!response.ok) {
+      throw new Error(blog.message || "Blog not found.");
+    }
+
+    target.innerHTML = `
+      <span class="category">${safe(blog.category)}</span>
+      <h1>${safe(blog.title)}</h1>
+      <p class="detail-meta">By ${safe(blog.author || "Anonymous")} · ${new Date(blog.createdAt).toLocaleString()}</p>
+      <div class="blog-content">${safe(blog.content).replace(/\n/g, "<br>")}</div>
+    `;
+  } catch (error) {
+    target.innerHTML = `<h2>Unable to load blog</h2><p>${safe(error.message)}</p>`;
+  }
 }
 
 document.getElementById("registerForm")?.addEventListener("submit", async (event) => {
@@ -103,7 +116,7 @@ document.getElementById("registerForm")?.addEventListener("submit", async (event
       location.href = "login.html";
     }, 800);
   } catch (error) {
-    message.textContent = "Backend server is not running. Start it on port 5000.";
+    message.textContent = "Backend server is not running or MongoDB is not connected.";
   }
 });
 
@@ -139,7 +152,7 @@ document.getElementById("loginForm")?.addEventListener("submit", async (event) =
       location.href = "dashboard.html";
     }, 700);
   } catch (error) {
-    message.textContent = "Backend server is not running. Start it on port 5000.";
+    message.textContent = "Backend server is not running or MongoDB is not connected.";
   }
 });
 
@@ -172,14 +185,14 @@ document.getElementById("blogForm")?.addEventListener("submit", async (event) =>
       return;
     }
 
-    message.textContent = "Blog published successfully!";
+    message.textContent = "Blog saved to MongoDB successfully!";
     event.target.reset();
 
     setTimeout(() => {
-      location.href = "dashboard.html";
-    }, 800);
+      location.href = `blog-detail.html?id=${encodeURIComponent(data.blog._id)}`;
+    }, 700);
   } catch (error) {
-    message.textContent = "Backend server is not running. Start it on port 5000.";
+    message.textContent = "Backend server is not running or MongoDB is not connected.";
   }
 });
 
@@ -187,8 +200,9 @@ const currentUser = JSON.parse(localStorage.getItem("codomaxUser") || "null");
 const welcome = document.getElementById("welcomeText");
 
 if (welcome && currentUser) {
-  welcome.textContent = `Welcome, ${currentUser.name}. Manage your posts and keep writing.`;
+  welcome.textContent = `Welcome, ${currentUser.name}. Manage your MongoDB-powered blog posts.`;
 }
 
 renderPosts("blogGrid");
 renderPosts("dashboardPosts");
+loadBlogDetail();
