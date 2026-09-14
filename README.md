@@ -1,102 +1,121 @@
 # Codomax Blog Application
 
-Full Stack Web Development internship project for **Codomax Digital Solutions**.
+A production-ready **Full Stack Blog Application** created for the Codomax Digital Solutions Full Stack Web Development Internship.
 
-## Module 1 — Frontend Development
-Completed:
-- Responsive Blog Application
-- Home, Login, Register, Dashboard and Create Blog pages
+The project includes a responsive frontend, REST API backend, MongoDB database integration, secure JWT authentication, user-specific dashboards, full CRUD operations, search/filter features, individual blog pages, profile management, logout, and Vercel deployment support.
 
-## Module 2 — Backend Development
-Completed:
-- Node.js and Express.js backend
-- REST APIs
+## Live Demo
+
+After deployment, add your live website URL here.
+
+## GitHub Repository
+
+https://github.com/Neerajk989/codomax-blog-application
+
+## Features
+
+- Responsive modern UI for desktop, tablet and mobile
 - User Registration and Login
-- Frontend/backend integration
+- Password hashing with bcrypt
+- JWT-based authentication
+- Private Dashboard
+- User Profile and Logout
+- Create, Read, Update and Delete blog posts
+- Only the blog owner can edit or delete their posts
+- Logged-in dashboard shows only the current user's blogs
+- Public blog listing
+- Individual blog detail pages
+- Blog search by title, content or author
+- Category filtering
+- MongoDB database integration
+- Production-ready Vercel serverless API
 
-## Module 3 — Database Integration
-Completed:
-- MongoDB + Mongoose
-- User credentials and blogs stored in MongoDB
-- bcrypt password hashing
-- Individual blog details page
-
-## Module 4 — CRUD Operations
-Completed:
-- Create, Read, Update and Delete blogs
-- Search blogs
-- Category filters
-- Edit Blog page
-
-## Module 5 — Authentication & Dashboard
-Completed:
-- JWT-based user authentication
-- JWT token returned after successful login
-- Protected backend routes using Bearer tokens
-- Protected Dashboard, Create Blog, Edit Blog and Profile pages
-- Dashboard shows only the logged-in user's blogs
-- Blog ownership stored with each MongoDB blog document
-- Users can edit/delete only their own blogs
-- User Profile page
-- Logout functionality
-- JWT expiry set to 2 hours
-- Profile API: `GET /api/profile`
-- User-specific blogs API: `GET /api/my-blogs`
-
-## Technologies
+## Technology Stack
 
 ### Frontend
 - HTML5
 - CSS3
-- JavaScript
+- Vanilla JavaScript
 
 ### Backend
 - Node.js
 - Express.js
-- JSON Web Token (JWT)
+- JSON Web Token
 - bcryptjs
-- CORS
-- dotenv
 
 ### Database
 - MongoDB
 - Mongoose
 
-## Authentication API
+### Deployment
+- Vercel
 
-- `POST /api/register` — Register user
-- `POST /api/login` — Login and receive JWT
-- `GET /api/profile` — Protected profile
-- `GET /api/my-blogs` — Protected logged-in user's blogs
+## Project Structure
 
-Protected requests use:
+```text
+codomax-blog-application/
+├── api/
+│   └── index.js
+├── backend/
+│   ├── server.js
+│   ├── package.json
+│   ├── .env.example
+│   └── README.md
+├── index.html
+├── login.html
+├── register.html
+├── dashboard.html
+├── create-blog.html
+├── edit-blog.html
+├── blog-detail.html
+├── profile.html
+├── styles.css
+├── script.js
+├── package.json
+├── vercel.json
+└── README.md
+```
+
+## REST API
+
+### Authentication
+- `POST /api/register`
+- `POST /api/login`
+- `GET /api/profile`
+
+### Blogs
+- `GET /api/blogs`
+- `GET /api/blogs/:id`
+- `GET /api/my-blogs`
+- `POST /api/blogs`
+- `PUT /api/blogs/:id`
+- `DELETE /api/blogs/:id`
+
+### Health Check
+- `GET /api/health`
+
+## Authentication
+
+Protected requests send the JWT in the HTTP Authorization header:
 
 ```http
 Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
-## Blog API
+JWT tokens expire after 2 hours.
 
-- `POST /api/blogs` — Create blog (protected)
-- `GET /api/blogs` — Public list of blogs
-- `GET /api/blogs/:id` — Public individual blog
-- `PUT /api/blogs/:id` — Update own blog (protected)
-- `DELETE /api/blogs/:id` — Delete own blog (protected)
+## Local Setup
 
-## Project Pages
+### 1. Clone the repository
 
-- `index.html` — Public blog listing
-- `login.html` — Login
-- `register.html` — Register
-- `dashboard.html` — Private user dashboard
-- `create-blog.html` — Protected create page
-- `edit-blog.html` — Protected edit page
-- `blog-detail.html` — Blog details
-- `profile.html` — Private user profile
+```bash
+git clone https://github.com/Neerajk989/codomax-blog-application.git
+cd codomax-blog-application
+```
 
-## Environment Setup
+### 2. Configure the backend
 
-Create `backend/.env` from `backend/.env.example`:
+Create `backend/.env` using `backend/.env.example`:
 
 ```env
 MONGODB_URI=your_mongodb_connection_string
@@ -106,7 +125,7 @@ PORT=5000
 
 Never commit your real `.env` file.
 
-## Run
+### 3. Install and run the local backend
 
 ```bash
 cd backend
@@ -114,10 +133,70 @@ npm install
 npm start
 ```
 
-Then open the frontend using VS Code Live Server.
+### 4. Run the frontend
 
-## Internship Submission
+Open the project root in VS Code and launch `index.html` with Live Server.
 
-**GitHub Repository:** https://github.com/Neerajk989/codomax-blog-application
+When running locally, the frontend automatically uses:
 
-Created by **Neeraj Khapre** as part of the Codomax Full Stack Web Development Internship.
+```text
+http://localhost:5000/api
+```
+
+When deployed, it automatically uses:
+
+```text
+/api
+```
+
+## Vercel Deployment
+
+This repository contains:
+
+- `api/index.js` — Vercel serverless Express API
+- root `package.json` — production dependencies
+- `vercel.json` — API rewrite configuration
+
+In Vercel, configure these Environment Variables:
+
+```env
+MONGODB_URI=your_mongodb_atlas_connection_string
+JWT_SECRET=your_long_random_secret
+```
+
+Then deploy the repository. Static HTML/CSS/JavaScript pages and the serverless API will run from the same Vercel project.
+
+## Internship Modules Completed
+
+### Module 1 — Frontend Development
+Responsive Blog UI with Home, Login, Register, Dashboard and Create Blog pages.
+
+### Module 2 — Backend Development
+Node.js, Express.js and REST API integration.
+
+### Module 3 — Database Integration
+MongoDB and Mongoose for users and blog posts.
+
+### Module 4 — CRUD Operations
+Create, Read, Update and Delete with search and category filters.
+
+### Module 5 — Authentication & Dashboard
+JWT authentication, protected private pages, user-specific blogs, profile and logout.
+
+### Module 6 — Final Project & Deployment
+UI polish, bug fixes, mobile responsiveness, professional documentation and production deployment configuration.
+
+## Security Notes
+
+- Passwords are stored only as bcrypt hashes.
+- Database credentials and JWT secrets are loaded from environment variables.
+- `.env` is excluded from Git.
+- Update and delete APIs enforce blog ownership.
+- Private frontend pages verify the logged-in session with the backend.
+
+## Author
+
+**Neeraj Khapre**
+
+Full Stack Web Development Internship Project  
+Codomax Digital Solutions
