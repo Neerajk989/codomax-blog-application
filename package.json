@@ -1,0 +1,12 @@
+{
+  "name": "codomax-blog-application",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Full Stack Blog Application for Codomax Digital Solutions Internship",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5"
+  }
+}
