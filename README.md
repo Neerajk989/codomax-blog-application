@@ -2,36 +2,37 @@
 
 Full Stack Web Development internship project for **Codomax Digital Solutions**.
 
-## Module 1 — Day 1 to Day 4
+## Module 1 — Frontend Development
 
-Frontend Development | Beginner | High Priority
-
-### Completed
-
-- Set up the frontend project
-- Built the application using HTML, CSS and JavaScript
-- Created a responsive Blog Application interface
+Completed:
+- Responsive Blog Application
 - Home page
 - Login page
 - Register page
 - Dashboard
 - Create Blog page
 
-## Module 2 — Day 5 to Day 8
+## Module 2 — Backend Development
 
-Backend Development | Intermediate | High Priority
+Completed:
+- Node.js and Express.js backend
+- REST APIs
+- User Registration
+- User Login
+- Create Blog
+- Frontend and backend integration
 
-### Completed
+## Module 3 — Database Integration
 
-- Set up a backend server using Node.js and Express.js
-- Created REST APIs
-- User Registration API
-- User Login API
-- Create Blog API
-- Get Blogs API
-- Connected the frontend forms and blog pages to backend APIs
-- Added bcrypt password hashing
-- Added simple JSON file persistence for users and blogs
+Completed:
+- MongoDB database integration with Mongoose
+- User credentials stored in MongoDB
+- Passwords hashed with bcrypt
+- Blog posts stored in MongoDB
+- Retrieve and display all blogs from the database
+- Individual blog details page
+- `GET /api/blogs/:id` API
+- Secure database connection through `MONGODB_URI` environment variable
 
 ## Technologies
 
@@ -45,7 +46,11 @@ Backend Development | Intermediate | High Priority
 - Express.js
 - bcryptjs
 - CORS
-- JSON file storage
+- dotenv
+
+### Database
+- MongoDB
+- Mongoose
 
 ## REST API Endpoints
 
@@ -53,10 +58,29 @@ Backend Development | Intermediate | High Priority
 - `POST /api/login`
 - `POST /api/blogs`
 - `GET /api/blogs`
+- `GET /api/blogs/:id`
+
+## Project Pages
+
+- `index.html` — Home and all database blogs
+- `login.html` — Login
+- `register.html` — Register
+- `dashboard.html` — Dashboard
+- `create-blog.html` — Create Blog
+- `blog-detail.html` — Individual Blog Details
 
 ## Run the Project
 
-### 1. Start the backend
+### 1. Configure MongoDB
+
+Inside the `backend` folder, copy `.env.example` to `.env` and replace the example value with your MongoDB Atlas connection string.
+
+```env
+MONGODB_URI=your_mongodb_connection_string
+PORT=5000
+```
+
+### 2. Start the backend
 
 ```bash
 cd backend
@@ -64,38 +88,9 @@ npm install
 npm start
 ```
 
-Backend runs at:
+### 3. Start the frontend
 
-```
-http://localhost:5000
-```
-
-### 2. Start the frontend
-
-Open the project root using VS Code and launch `index.html` with Live Server.
-
-The frontend uses:
-
-```
-http://localhost:5000/api
-```
-
-as its API base URL.
-
-## Project Pages
-
-- `index.html` — Home
-- `login.html` — Login
-- `register.html` — Register
-- `dashboard.html` — Dashboard
-- `create-blog.html` — Create Blog
-
-## Backend Files
-
-- `backend/server.js` — Express server and REST APIs
-- `backend/package.json` — Backend dependencies and scripts
-- `backend/data.json` — Simple development data storage
-- `backend/README.md` — API usage instructions
+Open the project root with VS Code and run `index.html` using Live Server.
 
 ## Internship Submission
 
