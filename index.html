@@ -22,17 +22,27 @@
 <div>
 <p class="eyebrow">Codomax Internship Project</p>
 <h1>Share ideas. Learn. Build. Grow.</h1>
-<p>A responsive beginner blog application built using HTML, CSS and JavaScript.</p>
+<p>A full-stack CRUD Blog Application built with HTML, CSS, JavaScript, Node.js, Express and MongoDB.</p>
 <div class="hero-actions">
 <a class="btn" href="create-blog.html">Create Blog</a>
-<a class="btn secondary" href="dashboard.html">View Dashboard</a>
+<a class="btn secondary" href="dashboard.html">Manage Blogs</a>
 </div>
 </div>
 </section>
 
 <section class="section">
-<p class="eyebrow">Latest Posts</p>
-<h2>Explore the Blog</h2>
+<p class="eyebrow">Explore Blogs</p>
+<h2>Latest Posts</h2>
+<div class="filter-bar">
+<input id="searchBlogs" type="search" placeholder="Search blogs...">
+<select id="categoryFilter">
+<option value="">All Categories</option>
+<option>Technology</option>
+<option>Web Development</option>
+<option>Learning</option>
+<option>Programming</option>
+</select>
+</div>
 <div id="blogGrid" class="blog-grid"></div>
 </section>
 </main>
