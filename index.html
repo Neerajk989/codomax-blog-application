@@ -3,39 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Codomax Blog</title>
+<meta name="description" content="A secure full-stack blog application built with HTML, CSS, JavaScript, Node.js, Express, MongoDB and JWT authentication.">
+<title>Codomax Blog | Full Stack Project</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <header class="navbar">
-<a class="brand" href="index.html">Codomax Blog</a>
+<a class="brand" href="index.html"><span class="brand-mark">C</span>Codomax Blog</a>
 <nav>
 <a href="index.html">Home</a>
 <a href="dashboard.html">Dashboard</a>
 <a href="login.html">Login</a>
-<a class="btn small" href="register.html">Register</a>
+<a class="btn small" href="register.html">Get Started</a>
 </nav>
 </header>
 
 <main>
 <section class="hero">
-<div>
-<p class="eyebrow">Codomax Internship Project</p>
-<h1>Share ideas. Learn. Build. Grow.</h1>
-<p>A full-stack CRUD Blog Application built with HTML, CSS, JavaScript, Node.js, Express and MongoDB.</p>
+<div class="hero-copy">
+<p class="eyebrow">Final Full Stack Internship Project</p>
+<h1>Write. Publish. Manage. Share.</h1>
+<p>A polished full-stack blog platform with secure authentication, MongoDB storage, personal dashboards, search, filters and complete CRUD operations.</p>
 <div class="hero-actions">
-<a class="btn" href="create-blog.html">Create Blog</a>
-<a class="btn secondary" href="dashboard.html">Manage Blogs</a>
+<a class="btn" href="register.html">Start Writing</a>
+<a class="btn secondary" href="#blogs">Explore Blogs</a>
+</div>
+<div class="hero-badges">
+<span>JWT Auth</span>
+<span>MongoDB</span>
+<span>Responsive UI</span>
+<span>CRUD</span>
 </div>
 </div>
 </section>
 
-<section class="section">
-<p class="eyebrow">Explore Blogs</p>
-<h2>Latest Posts</h2>
+<section class="feature-strip">
+<div><strong>Secure</strong><span>JWT protected user actions</span></div>
+<div><strong>Responsive</strong><span>Optimized for mobile and desktop</span></div>
+<div><strong>Full Stack</strong><span>Express API with MongoDB</span></div>
+</section>
+
+<section id="blogs" class="section">
+<div class="section-heading">
+<div>
+<p class="eyebrow">Community</p>
+<h2>Latest Blog Posts</h2>
+<p>Search published posts or filter them by category.</p>
+</div>
+</div>
+
 <div class="filter-bar">
-<input id="searchBlogs" type="search" placeholder="Search blogs...">
-<select id="categoryFilter">
+<input id="searchBlogs" type="search" placeholder="Search by title, content or author" aria-label="Search blogs">
+<select id="categoryFilter" aria-label="Filter by category">
 <option value="">All Categories</option>
 <option>Technology</option>
 <option>Web Development</option>
@@ -43,11 +62,16 @@
 <option>Programming</option>
 </select>
 </div>
+
 <div id="blogGrid" class="blog-grid"></div>
 </section>
 </main>
 
-<footer>Built by Neeraj Khapre for Codomax Digital Solutions Internship.</footer>
+<footer>
+<strong>Codomax Blog</strong>
+<span>Built by Neeraj Khapre for Codomax Digital Solutions Internship.</span>
+</footer>
+
 <script src="script.js"></script>
 </body>
 </html>
