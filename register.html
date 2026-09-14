@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register | Codomax Blog</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="navbar"><a class="brand" href="index.html">Codomax Blog</a><nav><a href="index.html">Home</a><a href="login.html">Login</a></nav></header>
+<main class="auth-wrapper">
+<section class="form-card">
+<p class="eyebrow">Join the Community</p>
+<h1>Create Account</h1>
+<form id="registerForm">
+<label>Full Name<input id="registerName" type="text" placeholder="Your name" required></label>
+<label>Email<input id="registerEmail" type="email" placeholder="you@example.com" required></label>
+<label>Password<input id="registerPassword" type="password" placeholder="Minimum 6 characters" minlength="6" required></label>
+<button class="btn full" type="submit">Register</button>
+<p id="registerMessage" class="message"></p>
+</form>
+<p class="center-text">Already registered? <a href="login.html">Login</a></p>
+</section>
+</main>
+<script src="script.js"></script>
+</body>
+</html>
